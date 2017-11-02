@@ -1,4 +1,5 @@
 var fs = require('fs');
+var worker = require('../workers/htmlfetcher.js');
 
 // Sync is ok here because this is called just once on startup.
 module.exports = function (basePath) {

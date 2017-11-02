@@ -28,20 +28,26 @@ describe('server', function() {
   describe('archived websites', function () {
     describe('GET', function () {
       it('should return the content of a website from the archive', function (done) {
-        var fixtureName = 'www.google.com';
-        var fixturePath = archive.paths.archivedSites + '/' + fixtureName + '/index.html';
+        var fixtureName = 'www.getwebsite.com';
+        var dirPath = archive.paths.archivedSites + '/' + fixtureName;
+        var fixturePath = dirPath + '/index.html';
 
+
+        //Create directory if it doesn't exist
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath);
+        }
         // Create or clear the file.
         var fd = fs.openSync(fixturePath, 'w');
-        fs.writeSync(fd, 'google');
+        fs.writeSync(fd, 'getwebsite');
         fs.closeSync(fd);
 
         // Write data to the file.
-        fs.writeFileSync(fixturePath, 'google');
+        fs.writeFileSync(fixturePath, 'getwebsite');
 
         request
           .get('/' + fixtureName)
-          .expect(200, /google/, function (err) {
+          .expect(200, /getwebsite/, function (err) {
             fs.unlinkSync(fixturePath);
             done(err);
           });
@@ -144,14 +150,14 @@ describe('archive helpers', function() {
 
   describe('#downloadUrls', function () {
     it('should download all pending urls in the list', function (done) {
-      var urlArray = ['www.example.com', 'www.google.com'];
+      var urlArray = ['www.example.com', 'www.getwebsite.com', 'www.google.com'];
       archive.downloadUrls(urlArray);
 
       // Ugly hack to wait for all downloads to finish.
       setTimeout(function () {
         expect(fs.readdirSync(archive.paths.archivedSites)).to.deep.equal(urlArray);
         done();
-      }, 1000);
+      }, 1500);
     });
   });
 });

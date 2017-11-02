@@ -7,7 +7,6 @@ var readline = require('readline');
 var qs = require('querystring');
 // require more modules/folders here!
 
-// action at router[path][base][method]
 
 
 // serve up static files
@@ -23,41 +22,40 @@ var qs = require('querystring');
 // };
 
 
+// action at router[path][base][method]
 var router = {
-  '/': {
     
-    default: {
-      GET: function(req, res, asset) {
-        http.serveAssets(res, asset);
-      }
+  default: {
+    GET: function(req, res, asset) {
+      http.serveAssets(res, asset);
+    }
+  },
+  
+  '/': {  
+    GET: function(req, res) {
+      http.serveAssets(res, 'index.html');
     },
     
-    '': {  
-      GET: function(req, res) {
-        http.serveAssets(res, 'index.html');
-      },
+
+    POST: function(req, res) {
       
-  
-      POST: function(req, res) {
-        
-        var data = '';
-        req.on('data', function(chunk) {
-          data += chunk;
+      var data = '';
+      req.on('data', function(chunk) {
+        data += chunk;
+      });
+      
+      req.on('end', function() {
+        var url = qs.parse(data).url;
+        archive.isUrlInList(url, (isArchived) => {
+          if (isArchived) {
+            http.redirect(req, res, url);
+          } else {
+            http.redirect(req, res, 'loading.html');
+            archive.addUrlToList(url, () => {});
+          }
         });
-        
-        req.on('end', function() {
-          var url = qs.parse(data).url;
-          archive.isUrlInList(url, (isArchived) => {
-            if (isArchived) {
-              http.redirect(req, res, url);
-            } else {
-              http.redirect(req, res, 'loading.html');
-              archive.addUrlToList(url, () => {});
-            }
-          });
-        });
-        
-      }
+      });
+      
     }
   }
 };
@@ -66,18 +64,9 @@ exports.handleRequest = function (req, res) {
   
   console.log('Serving request type ' + req.method + ' for url ' + req.url);
   
-  //TODO handle 404s
-  var parseObj = path.parse(req.url);
+  var route = router[req.url] || router.default;
+  var action = route[req.method] || http.methodNotAllowed;
   
-  
-  var dir = router[parseObj.dir];
-  if (dir) {
-    var route = dir[parseObj.base] || dir.default;
-    var action = route[req.method] || http.methodNotAllowed;
-  } else {
-    var action = http.notFound;
-  }
-  
-  action(req, res, parseObj.base);
+  action(req, res, req.url);
   
 };

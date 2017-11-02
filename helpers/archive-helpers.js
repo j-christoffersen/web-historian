@@ -65,9 +65,13 @@ exports.downloadUrls = function(urls) {
     exports.isUrlArchived(url, (exists) => {
       if (!exists) {
         console.log(url);
+        console.log(exports.paths.archivedSites + '/' + url);
         var opts = {
-          urls: [url],
-          directory: exports.paths.archivedSites + '/' + url
+          urls: [`http://${url}`],
+          directory: exports.paths.archivedSites + '/' + url,
+          onResourceError: (resource, err) => {
+            console.log(`Resource ${resource} was not saved because of ${err}`);
+          }
         };
         
         scrape(opts).then((res) => {

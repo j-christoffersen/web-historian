@@ -12,21 +12,28 @@ exports.headers = {
 
 exports.serveAssets = function(res, asset) {
   var siteFilePath = archive.paths.siteAssets + '/' + asset;
-  var archiveFilePath = archive.paths.archivedSites + '/' + asset + '/index.html';
+  var archiveFilePath = archive.paths.archivedSites + '/' + asset;
+  console.log(archiveFilePath);
   if (fs.existsSync(siteFilePath)) {
     res.writeHead(200, exports.headers);
     var stream = fs.createReadStream(siteFilePath).pipe(res);
+  } else if (fs.existsSync(archiveFilePath + '/index.html')) {
+    console.log('a', asset);
+    exports.redirect(null, res, asset + '/index.html');
   } else if (fs.existsSync(archiveFilePath)) {
+    console.log(asset);
     res.writeHead(200, exports.headers);
     var stream = fs.createReadStream(archiveFilePath).pipe(res);
   } else {
+    console.log('fourofour');
     exports.notFound(null, res);
   }
 };
 
 //Serve it of Fetch it
 exports.redirect = function(req, res, asset) {
-  res.writeHead(302, {Location: '/' + asset});
+  console.log('Redirecting to: ' + asset);
+  res.writeHead(302, {Location: asset});
   res.end();
 };
 
