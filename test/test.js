@@ -37,16 +37,16 @@ describe('server', function() {
         if (!fs.existsSync(dirPath)) {
           fs.mkdirSync(dirPath);
         }
-        // Create or clear the file.
-        var fd = fs.openSync(fixturePath, 'w');
-        fs.writeSync(fd, 'getwebsite');
-        fs.closeSync(fd);
+        
+        if (!fs.existsSync(fixturePath)) {
+          fs.writeFile(fixturePath, 'getwebsite');
+        }
 
         // Write data to the file.
         fs.writeFileSync(fixturePath, 'getwebsite');
 
         request
-          .get('/' + fixtureName)
+          .get('/' + fixtureName + '/index.html')
           .expect(200, /getwebsite/, function (err) {
             fs.unlinkSync(fixturePath);
             done(err);
@@ -150,6 +150,7 @@ describe('archive helpers', function() {
 
   describe('#downloadUrls', function () {
     it('should download all pending urls in the list', function (done) {
+      //Should ideally clear out directory first
       var urlArray = ['www.example.com', 'www.getwebsite.com', 'www.google.com'];
       archive.downloadUrls(urlArray);
 
