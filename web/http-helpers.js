@@ -11,7 +11,7 @@ exports.headers = {
 };
 
 exports.serveAssets = function(res, asset) {
-  var siteFilePath    = archive.paths.siteAssets    + '/' + asset;
+  var siteFilePath = archive.paths.siteAssets + '/' + asset;
   var archiveFilePath = archive.paths.archivedSites + '/' + asset + '/index.html';
   if (fs.existsSync(siteFilePath)) {
     res.writeHead(200, exports.headers);
