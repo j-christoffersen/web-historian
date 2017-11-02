@@ -10,11 +10,36 @@ exports.headers = {
   'Content-Type': 'text/html'
 };
 
-exports.serveAssets = function(res, asset, callback) {
-  // Write some code here that helps serve up your static files!
-  // (Static files are things like html (yours or archived from others...),
-  // css, or anything that doesn't change often.)
+exports.serveAssets = function(res, asset) {
+  var siteFilePath    = archive.paths.siteAssets    + '/' + asset;
+  var archiveFilePath = archive.paths.archivedSites + '/' + asset + '/index.html';
+  if (fs.existsSync(siteFilePath)) {
+    res.writeHead(200, exports.headers);
+    var stream = fs.createReadStream(siteFilePath).pipe(res);
+  } else if (fs.existsSync(archiveFilePath)) {
+    res.writeHead(200, exports.headers);
+    var stream = fs.createReadStream(archiveFilePath).pipe(res);
+  } else {
+    exports.notFound(null, res);
+  }
 };
+
+//Serve it of Fetch it
+exports.redirect = function(req, res, asset) {
+  res.writeHead(302, {Location: '/' + asset});
+  res.end();
+};
+
+exports.methodNotAllowed = function(req, res) {
+  res.writeHead(405, exports.headers);
+  res.end();
+};
+
+exports.notFound = function(req, res) {
+  res.writeHead(404, exports.headers);
+  res.end();
+};
+
 
 
 

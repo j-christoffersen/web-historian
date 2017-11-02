@@ -29,7 +29,7 @@ describe('server', function() {
     describe('GET', function () {
       it('should return the content of a website from the archive', function (done) {
         var fixtureName = 'www.google.com';
-        var fixturePath = archive.paths.archivedSites + '/' + fixtureName;
+        var fixturePath = archive.paths.archivedSites + '/' + fixtureName + '/index.html';
 
         // Create or clear the file.
         var fd = fs.openSync(fixturePath, 'w');
@@ -151,7 +151,7 @@ describe('archive helpers', function() {
       setTimeout(function () {
         expect(fs.readdirSync(archive.paths.archivedSites)).to.deep.equal(urlArray);
         done();
-      }, 500);
+      }, 1000);
     });
   });
 });
